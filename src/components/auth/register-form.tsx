@@ -1,7 +1,9 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { registerUser } from '~/actions/register-user'
 import { useForm } from 'react-hook-form'
+import { LuLoader2 } from 'react-icons/lu'
 import { type z } from 'zod'
 import * as React from 'react'
 
@@ -10,6 +12,8 @@ import { Button } from '~/components/ui/button'
 import { CardWrapper } from '~/components/auth/card-wrapper'
 import { PasswordInput } from '~/components/password-input'
 
+import { FormError } from '../form-error'
+import { FormSuccess } from '../form-success'
 import {
   Form,
   FormControl,
@@ -24,6 +28,8 @@ type Inputs = z.infer<typeof RegisterSchema>
 
 export function RegisterForm() {
   const [isPending, startTransition] = React.useTransition()
+  const [successMessage, setSuccessMessage] = React.useState('')
+  const [errorMessage, setErrorMessage] = React.useState('')
 
   const form = useForm<Inputs>({
     defaultValues: { email: '', password: '', name: '' },
@@ -32,8 +38,18 @@ export function RegisterForm() {
   })
 
   function onSubmit(data: Inputs) {
+    setSuccessMessage('')
+    setErrorMessage('')
+
     startTransition(async () => {
-      console.log(data)
+      try {
+        const { message } = await registerUser(data)
+        setSuccessMessage(message)
+      } catch (err) {
+        if (err instanceof Error) {
+          setErrorMessage(err.message)
+        }
+      }
     })
   }
 
@@ -91,7 +107,12 @@ export function RegisterForm() {
               )}
             />
           </div>
-          <Button type="submit" className="w-full uppercase" disabled={isPending}>
+          <FormError message={errorMessage} />
+          <FormSuccess message={successMessage} />
+          <Button type="submit" className="w-full gap-x-2 uppercase" disabled={isPending}>
+            {isPending && (
+              <LuLoader2 size={16} className="animate-spin" aria-hidden="true" />
+            )}
             Criar conta
           </Button>
         </form>
