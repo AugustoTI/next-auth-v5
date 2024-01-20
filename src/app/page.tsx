@@ -10,7 +10,7 @@ export default function HomePage() {
         <p className="text-lg text-white [&_b]:underline [&_b]:underline-offset-4">
           Um <b>Robusto</b>, <b>Flexivel</b> e <b>Open Source</b> serviço de autenticação.
         </p>
-        <Button size="lg" variant="secondary" asChild>
+        <Button size="lg" className="uppercase" variant="secondary" asChild>
           <Link href="/auth/login">Login</Link>
         </Button>
       </div>
